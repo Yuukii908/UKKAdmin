@@ -28,6 +28,7 @@ class AuthController extends Controller
         $token = $user->createToken('flutter-token')->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'message' => 'Registrasi berhasil',
             'user' => $user,
             'token' => $token
@@ -41,17 +42,23 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        // Find user by email
+        $user = User::where('email', $credentials['email'])->first();
+
+        // Check if user exists and password is correct
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
+                'success' => false,
                 'message' => 'Email atau password salah'
             ], 401);
         }
 
-        $user = Auth::user();
-        
+        // Create token for API authentication
         $token = $user->createToken('flutter-token')->plainTextToken;
 
         return response()->json([
+            'success' => true,
+            'message' => 'Login berhasil',
             'user' => $user,
             'token' => $token
         ]);

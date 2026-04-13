@@ -17,6 +17,21 @@ return Application::configure(basePath: dirname(__DIR__))
         'role' => RoleMiddleware::class,
     ]);
     
+    // Ensure API routes are strictly stateless
+    $middleware->api(remove: [
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    ]);
+    
+    // Exclude API routes from CSRF and session middleware
+    $middleware->validateCsrfTokens(except: [
+        '*',
+    ]);
+    
     // Set default redirect for unauthenticated users
     $middleware->redirectTo(function () {
         return '/login';
